@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { User, Domain } = require("../models");
+const Post = require("../models/post");
+const Hashtag = require("../models/hashtag");
 
 exports.createToken = async (req, res) => {
   const { clientSecret } = req.body;
@@ -49,3 +51,44 @@ exports.createToken = async (req, res) => {
 exports.tokenTest = (req, res) => {
   res.json(res.locals.decoded);
 };
+
+
+exports.getMyPosts = (req, res) => {
+  Post.findAll({
+    where: { userId: res.locals.decoded.id },
+  }).then((posts) => {
+    res.json({
+      code: 200,
+      payload: posts,
+    })
+  }).catch((error) => {
+    return res.status(500).json({ 
+      code: 500,
+      message: "서버 에러",
+    });
+  })
+}
+
+exports.getHashtagPosts = async (req, res) => {
+  try {
+    const hashtag = await Hashtag.findOne({ where: { title: req.params.title } });
+    if (!hashtag) {
+      return res.status(404).json({
+        code: 404,
+        message: "존재하지 않는 해시태그입니다.",
+      });
+    }
+    const posts = await hashtag.getPosts({
+      where: { userId: res.locals.decoded.id },
+    });
+    return res.json({
+      code: 200,
+      payload: posts,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      code: 500,
+      message: "서버 에러",
+    });
+  }
+}
