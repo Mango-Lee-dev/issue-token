@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API 서버 로그인</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* Login Form Styles */
+      .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        width: 100%;
+        max-width: 450px;
+        animation: slideUp 0.5s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .login-card h2 {
+        color: #667eea;
+        margin-bottom: 30px;
+        font-size: 28px;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .input-group input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .input-group input::placeholder {
+        color: #bbb;
+      }
+
+      .info-text {
+        text-align: center;
+        color: #888;
+        font-size: 13px;
+        margin: 20px 0;
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 8px;
+      }
+
+      #login {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      #login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      #login:active {
+        transform: translateY(0);
+      }
+
+      /* Dashboard Styles */
+      .dashboard {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        margin-top: 20px;
+        animation: slideUp 0.5s ease-out;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .user-greeting {
+        font-size: 24px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .user-greeting .nickname {
+        color: #667eea;
+      }
+
+      .logout-btn {
+        padding: 10px 24px;
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+      }
+
+      .logout-btn:hover {
+        background: #ff5252;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .domain-form-card {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+
+      .domain-form-card legend {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        padding: 0 10px;
+        margin-bottom: 20px;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .radio-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #667eea;
+      }
+
+      .radio-option label {
+        font-size: 16px;
+        color: #555;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .domain-input-group {
+        margin-bottom: 20px;
+      }
+
+      .domain-input-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .domain-input-group input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .domain-input-group input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .submit-btn {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .domains-table-container {
+        overflow-x: auto;
+      }
+
+      .domains-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .domains-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .domains-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .domains-table td {
+        padding: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #555;
+      }
+
+      .domains-table tbody tr {
+        transition: background 0.2s ease;
+      }
+
+      .domains-table tbody tr:hover {
+        background: #f8f9fa;
+      }
+
+      .domains-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .type-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .type-badge.free {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+
+      .type-badge.premium {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+
+      .client-secret {
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        color: #666;
+        word-break: break-all;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-size: 16px;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard {
+          padding: 20px;
+        }
+
+        .dashboard-header {
+          flex-direction: column;
+          gap: 15px;
+          align-items: flex-start;
+        }
+
+        .radio-group {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .domains-table {
+          font-size: 14px;
+        }
+
+        .domains-table th,
+        .domains-table td {
+          padding: 12px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% if user and user.id %}
+    <div class="container">
+      <div class="dashboard">
+        <div class="dashboard-header">
+          <div class="user-greeting">
+            안녕하세요! <span class="nickname">{{user.nick}}</span>님
+          </div>
+          <a href="/auth/logout" class="logout-btn">로그아웃</a>
+        </div>
+
+        <fieldset class="domain-form-card">
+          <legend>도메인 등록</legend>
+          <form action="/domain" method="post">
+            <div class="radio-group">
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="type-free"
+                  name="type"
+                  value="free"
+                  checked
+                />
+                <label for="type-free">무료</label>
+              </div>
+              <div class="radio-option">
+                <input
+                  type="radio"
+                  id="type-premium"
+                  name="type"
+                  value="premium"
+                />
+                <label for="type-premium">프리미엄</label>
+              </div>
+            </div>
+            <div class="domain-input-group">
+              <label for="host">도메인</label>
+              <input
+                type="text"
+                id="host"
+                name="host"
+                placeholder="ex) zerocho.com"
+                required
+              />
+            </div>
+            <button type="submit" class="submit-btn">저장</button>
+          </form>
+        </fieldset>
+
+        <div class="domains-table-container">
+          <table class="domains-table">
+            <thead>
+              <tr>
+                <th>도메인 주소</th>
+                <th>타입</th>
+                <th>클라이언트 비밀키</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if domains and domains.length > 0 %} {% for domain in domains
+              %}
+              <tr>
+                <td>{{domain.host}}</td>
+                <td>
+                  <span class="type-badge {{domain.type}}"
+                    >{{domain.type}}</span
+                  >
+                </td>
+                <td>
+                  <span class="client-secret">{{domain.clientSecret}}</span>
+                </td>
+              </tr>
+              {% endfor %} {% else %}
+              <tr>
+                <td colspan="3" class="empty-state">
+                  등록된 도메인이 없습니다.
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="login-container">
+      <div class="login-card">
+        <h2>NodeBird API</h2>
+        <form action="/auth/login" id="login-form" method="post">
+          <div class="input-group">
+            <label for="email">이메일</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="이메일을 입력하세요"
+              required
+              autofocus
+            />
+          </div>
+          <div class="input-group">
+            <label for="password">비밀번호</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="비밀번호를 입력하세요"
+              required
+            />
+          </div>
+          <div class="info-text">회원가입은 localhost:8001에서 하세요.</div>
+          <button id="login" type="submit">로그인</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      window.onload = () => {
+        const urlParams = new URL(location.href).searchParams;
+        const error = urlParams.get("error");
+        const loginError = urlParams.get("loginError");
+        if (error) {
+          alert(error);
+        }
+        if (loginError) {
+          alert(decodeURIComponent(loginError));
+        }
+      };
+    </script>
+    {% endif %}
+  </body>
+</html>
