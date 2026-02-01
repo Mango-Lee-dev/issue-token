@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { User, Domain } = require("../models");
-const Post = require("../models/post");
-const Hashtag = require("../models/hashtag");
+const { User, Domain, Post, Hashtag } = require("../models");
 
 exports.createToken = async (req, res) => {
   const { clientSecret } = req.body;
@@ -81,6 +79,13 @@ exports.getHashtagPosts = async (req, res) => {
     const posts = await hashtag.getPosts({
       where: { userId: res.locals.decoded.id },
     });
+
+    if (!posts) {
+      return res.status(404).json({
+        code: 404,
+        message: "게시글이 존재하지 않습니다.",
+      });
+    }
     return res.json({
       code: 200,
       payload: posts,
