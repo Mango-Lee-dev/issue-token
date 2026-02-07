@@ -6,9 +6,8 @@ const {
   tokenTest,
   getMyPosts,
   getHashtagPosts,
-} = require("../controllers/v2");
+} = require("../controllers/v1");
 
-router.use(deprecated);
 //  v1/token
 router.post("/token", apiLimiter, createToken);
 router.get("/test", verifyToken, tokenTest);
